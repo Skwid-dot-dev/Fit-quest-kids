@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitQuest Kids - Gamified Workouts</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff;
+            color: #333;
+        }
+        
+        header {
+            background-color: #6a5acd;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .header-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.2;
+            background: repeating-linear-gradient(45deg, #ffd700, #ffd700 15px, #ff6347 15px, #ff6347 30px);
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .game-container {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        /* Navigation tabs */
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #e6e6e6;
+            padding-bottom: 10px;
+        }
+        
+        .nav-tab {
+            background-color: #e6e6e6;
+            border-radius: 10px 10px 0 0;
+            padding: 10px 20px;
+            margin: 0 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .nav-tab.active {
+            background-color: #6a5acd;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .character-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .character {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+            background-color: #ffd700;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        
+        .character-face {
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .character-eyes {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .character-eye {
+            width: 20px;
+            height: 20px;
+            background-color: #333;
+            border-radius: 50%;
+        }
+        
+        .character-mouth {
+            width: 60px;
+            height: 30px;
+            margin-top: 15px;
+            background-color: #ff6347;
+            border-radius: 0 0 30px 30px;
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .character-accessories {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .accessory-crown {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 40px;
+            background-color: gold;
+            clip-path: polygon(50% 0%, 80% 30%, 100% 0, 100% 100%, 0 100%, 0 0, 20% 30%);
+            display: none;
+        }
+        
+        .accessory-cape {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 80px;
+            background-color: red;
+            border-radius: 50% 50% 0 0;
+            z-index: -1;
+            display: none;
+        }
+        
+        .accessory-shield {
+            position: absolute;
+            top: 50%;
+            left: -20px;
+            width: 50px;
+            height: 60px;
+            background-color: blue;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            display: none;
+        }
+        
+        .accessory-boots {
+            position: absolute;
+            bottom: -10px;
+            width: 100%;
+            height: 20px;
+            display: none;
+        }
+        
+        .boot {
+            position: absolute;
+            bottom: 0;
+            width: 30px;
+            height: 20px;
+            background-color: green;
+            border-radius: 0 0 5px 5px;
+        }
+        
+        .boot.left {
+            left: 30px;
+        }
+        
+        .boot.right {
+            right: 30px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        
+        .stat {
+            text-align: center;
+            background-color: #f0f8ff;
+            border-radius: 10px;
+            padding: 10px;
+            width: 30%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat h3 {
+            margin-top: 0;
+            color: #6a5acd;
+        }
+        
+        .progress-bar {
+            height: 20px;
+            background-color: #ddd;
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: #4caf50;
+            width: 75%;
+            transition: width 0.5s ease-in-out;
+        }
+        
+        .progress-xp {
+            background-color: #ffd700;
+            width: 45%;
+        }
+        
+        .progress-coins {
+            background-color: #ff6347;
+            width: 60%;
+        }
+        
+        .workout-area {
+            background-color: #e6f7ff;
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .exercise {
+            font-size: 2em;
+            margin: 20px 0;
+            color: #6a5acd;
+            font-weight: bold;
+        }
+        
+        .timer {
+            font-size: 3em;
+            font-weight: bold;
+            color: #ff6347;
+            margin: 20px 0;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        button {
+            padding: 12px 24px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .start-btn {
+            background-color: #4caf50;
+            color: white;
+        }
+        
+        .skip-btn {
+            background-color: #ff9800;
+            color: white;
+        }
+        
+        .done-btn {
+            background-color: #6a5acd;
+            color: white;
+        }
+        
+        .exercises-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .exercise-card {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 200px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+        
+        .exercise-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+        
+        .exercise-image {
+            width: 120px;
+            height: 120px;
+            background-color: #f0f8ff;
+            border-radius: 15px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .rewards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .reward-card {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 150px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+        
+        .reward-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+        
+        .reward-image {
+            width: 80px;
+            height: 80px;
+            background-color: #ffd700;
+            border-radius: 15px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .reward-cost {
+            background-color: #ff6347;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: bold;
+        }
+        
+        /* Achievement badges */
+        .achievements {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .badge {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #f0f8ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: transform 0.3s;
+        }
+        
+        .badge:hover {
+            transform: scale(1.1);
+        }
+        
+        .badge-icon {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+        
+        .badge-locked {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2em;
+        }
+        
+        .badge-tooltip {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            white-space: nowrap;
+            z-index: 10;
+        }
+        
+        .badge:hover .badge-tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Daily challenge */
+        .daily-challenge {
+            background-color: #ffe4e1;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px 0;
+            border: 2px dashed #ff6347;
+            position: relative;
+        }
+        
+        .daily-challenge-badge {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            background-color: #ff6347;
+            color: white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+            transform: rotate(15deg);
+        }
+        
+        /* Custom character */
+        .character-customization {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+        
+        .color-option.selected {
+            border: 2px solid black;
+        }
+        
+        .color-section {
+            margin: 15px 0;
+        }
+        
+        /* Mini game */
+        .mini-game {
+            background-color: #e6f7ff;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            position: relative;
+        }
+        
+        .game-canvas {
+            background-color: white;
+            border-radius: 10px;
+            margin: 0 auto;
+            display: block;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Notification system */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4caf50;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transform: translateX(200%);
+            transition: transform 0.5s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification-icon {
+            margin-right: 10px;
+            font-size: 1.5em;
+        }
+        
+        /* User profile and settings */
+        .profile-section {
+            text-align: left;
+            padding: 20px;
+        }
+        
+        .profile-form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+        
+        /* Streak calendar */
+        .streak-calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin: 20px auto;
+            max-width: 300px;
+        }
+        
+        .calendar-day {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f8ff;
+            font-size: 0.8em;
+        }
+        
+        .calendar-day.completed {
+            background-color: #4caf50;
+            color: white;
+        }
+        
+        .calendar-day.today {
+            border: 2px solid #ff6347;
+        }
+        
+        /* Animation effects */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .bounce {
+            animation: bounce 0.5s ease infinite;
+        }
+        
+        .spin {
+            animation: spin 1s linear infinite;
+        }
+        
+        .pulse {
+            animation: pulse 1s ease-in-out infinite;
+        }
+        
+        /* Confetti effect */
+        .confetti-container {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 999;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #ffd700;
+            opacity: 0;
+        }
+        
+        footer {
+            background-color: #6a5acd;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 50px;
+        }
+        
+        @media (max-width: 768px) {
+            .stats {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .stat {
+                width: 80%;
+                margin-bottom: 15px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            button {
+                width: 80%;
+            }
+            
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .nav-tab {
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-bg"></div>
+        <div class="header-content">
+            <h1>FitQuest Kids</h1>
+            <p>Turn exercise into an adventure!</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="game-container">
+            <!-- Navigation tabs -->
+            <div class="nav-tabs">
+                <div class="nav-tab active" data-tab="home">Home</div>
+                <div class="nav-tab" data-tab="customize">Customize</div>
+                <div class="nav-tab" data-tab="achievements">Achievements</div>
+                <div class="nav-tab" data-tab="mini-game">Mini Game</div>
+                <div class="nav-tab" data-tab="profile">Profile</div>
+            </div>
+            
+            <!-- Home tab content -->
+            <div id="home" class="tab-content active">
+                <div class="character-container">
+                    <div class="character" id="character">
+                        <div class="character-face">
+                            <div class="character-eyes">
+                                <div class="character-eye"></div>
+                                <div class="character-eye"></div>
+                            </div>
+                            <div class="character-mouth"></div>
+                        </div>
+                        <div class="character-accessories">
+                            <div class="accessory-crown" id="crown"></div>
+                            <div class="accessory-cape" id="cape"></div>
+                            <div class="accessory-shield" id="shield"></div>
+                            <div class="accessory-boots" id="boots">
+                                <div class="boot left"></div>
+                                <div class="boot right"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h2>Captain Flex</h2>
+                    <p>Level <span id="level-display">5</span> Fitness Hero</p>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat">
+                        <h3>Energy</h3>
+                        <div class="progress-bar">
+                            <div class="progress" id="energy-bar"></div>
+                        </div>
+                        <p><span id="energy-value">75</span>/100</p>
+                    </div>
+                    
+                    <div class="stat">
+                        <h3>Experience</h3>
+                        <div class="progress-bar">
+                            <div class="progress progress-xp" id="xp-bar"></div>
+                        </div>
+                        <p><span id="xp-value">450</span>/1000 XP</p>
+                    </div>
+                    
+                    <div class="stat">
+                        <h3>Fitness Coins</h3>
+                        <div class="progress-bar">
+                            <div class="progress progress-coins" id="coins-bar"></div>
+                        </div>
+                        <p><span id="coins-value">60</span> coins</p>
+                    </div>
+                </div>
+                
+                <!-- Daily challenge -->
+                <div class="daily-challenge">
+                    <div class="daily-challenge-badge">DAILY</div>
+                    <h3>Today's Special Challenge</h3>
+                    <p id="daily-challenge-text">Complete 5 different exercises to earn a special reward!</p>
+                    <div class="progress-bar">
+                        <div class="progress" id="challenge-progress" style="width: 20%;"></div>
+                    </div>
+                    <p><span id="challenge-progress-text">1/5</span> completed</p>
+                    <p><strong>Reward:</strong> <span id="challenge-reward">25 coins + Rare Trophy Badge</span></p>
+                </div>
+                
+                <!-- Streak calendar -->
+                <h3>Your Exercise Streak</h3>
+                <div class="streak-calendar" id="streak-calendar">
+                    <!-- Will be filled by JavaScript -->
+                </div>
+                <p>Current streak: <span id="current-streak">3</span> days</p>
+                
+                <div class="workout-area">
+                    <h2>Today's Quest</h2>
+                    <p>Complete these exercises to earn rewards!</p>
+                    
+                    <div class="exercise" id="current-exercise">Star Jumps</div>
+                    <div class="timer" id="timer">30</div>
+                    
+                    <div class="buttons">
+                        <button class="start-btn" id="start-btn">Start!</button>
+                        <button class="skip-btn" id="skip-btn">Skip</button>
+                        <button class="done-btn" id="done-btn">I Did It!</button>
+                    </div>
+                </div>
+                
+                <h2>Exercise Adventure</h2>
+                <div class="exercises-list" id="exercises-list">
+                    <div class="exercise-card" data-exercise="Jumping Jacks" data-time="30" data-xp="10" data-coins="5">
+                        <div class="exercise-image">Jumping Jacks</div>
+                        <h3>Jumping Jacks</h3>
+                        <p>30 seconds</p>
+                        <p>+10 XP, +5 coins</p>
+                    </div>
+                    
+                    <div class="exercise-card" data-exercise="Frog Jumps" data-time="20" data-xp="8" data-coins="4">
+                        <div class="exercise-image">Frog Jumps</div>
+                        <h3>Frog Jumps</h3>
+                        <p>20 seconds</p>
+                        <p>+8 XP, +4 coins</p>
+                    </div>
+                    
+                    <div class="exercise-card" data-exercise="Superhero Pose" data-time="15" data-xp="5" data-coins="3">
+                        <div class="exercise-image">Superhero Pose</div>
+                        <h3>Superhero Pose</h3>
+                        <p>15 seconds</p>
+                        <p>+5 XP, +3 coins</p>
+                    </div>
+                    
+                    <div class="exercise-card" data-exercise="Monkey Walk" data-time="25" data-xp="12" data-coins="6">
+                        <div class="exercise-image">Monkey Walk</div>
+                        <h3>Monkey Walk</h3>
+                        <p>25 seconds</p>
+                        <p>+12 XP, +6 coins</p>
+                    </div>
+                    
+                    <div class="exercise-card" data-exercise="Robot Dance" data-time="20" data-xp="7" data-coins="4">
+                        <div class="exercise-image">Robot Dance</div>
+                        <h3>Robot Dance</h3>
+                        <p>20 seconds</p>
+                        <p>+7 XP, +4 coins</p>
+                    </div>
+                    
+                    <div class="exercise-card" data-exercise="Airplane Arms" data-time="25" data-xp="9" data-coins="5">
+                        <div class="exercise-image">Airplane Arms</div>
+                        <h3>Airplane Arms</h3>
+                        <p>25 seconds</p>
+                        <p>+9 XP, +5 coins</p>
+                    </div>
+                </div>
+                
+                <h2>Rewards Shop</h2>
+                <div class="rewards">
+                    <div class="reward-card" data-reward="crown" data-cost="25">
+                        <div class="reward-image">Crown</div>
+                        <h3>Royal Crown</h3>
+                        <div class="reward-cost">25 coins</div>
+                    </div>
+                    
+                    <div class="reward-card" data-reward="cape" data-cost="40">
+                        <div class="reward-image">Cape</div>
+                        <h3>Super Cape</h3>
+                        <div class="reward-cost">40 coins</div>
+                    </div>
+                    
+                    <div class="reward-card" data-reward="shield" data-cost="30">
+                        <div class="reward-image">Shield</div>
+                        <h3>Power Shield</h3>
+                        <div class="reward-cost">30 coins</div>
+                    </div>
+                    
+                    <div class="reward-card" data-reward="boots" data-cost="35">
+                        <div class="reward-image">Boots</div>
+                        <h3>Speed Boots</h3>
+                        <div class="reward-cost">35 coins</div>
+                    </div>
+                    
+                    <div class="reward-card" data-reward="background" data-cost="50">
+                        <div class="reward-image">Background</div>
+                        <h3>Space Background</h3>
+                        <div class="reward-cost">50 coins</div>
+                    </div>
+                    
+                    <div class="reward-card" data-reward="special-move" data-cost="60">
+                        <div class="reward-image">Special Move</div>
+                        <h3>Victory Dance</h3>
+                        <div class="reward-cost">60 coins</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Customize tab content -->
+            <div id="customize" class="tab-content">
+                <h2>Customize Your Character</h2>
+                
+                <div class="character" id="character-preview" style="margin-bottom: 20px;">
+                    <div class="character-face">
+                        <div class="character-eyes">
+                            <div class="character-eye"></div>
+                            <div class="character-eye"></div>
+                        </div>
+                        <div class="character-mouth"></div>
+                    </div>
+                    <div class="character-accessories">
+                        <div class="accessory-crown"></div>
+                        <div class="accessory-cape"></div>
+                        <div class="accessory-shield"></div>
+                        <div class="accessory-boots">
+                            <div class="boot left"></div>
+                            <div class="boot right"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="character-customization">
+                    <div class="color-section">
+                        <h3>Body Color</h3>
+                        <div style="display: flex; gap: 10px; justify-content: center;">
+                            <div class="color-option selected" style="background-color: #ffd700;" data-type="body" data-color="#ffd700"></div>
+                            <div class="color-option" style="background-color: #ff6347;" data-type="body" data-color="#ff6347"></div>
+                            <div class="color-option" style="background-color: #4caf50;" data-type="body" data-color="#4c
